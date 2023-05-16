@@ -1,0 +1,35 @@
+
+# The deployment version, with a default value of 0.0, CodeDeploy will automatically increment this value on each successful deployment
+version: 0.0
+
+# The operating system running on the target compute resource.
+# For EC2 instances using Ubuntu, RHEL, or Linux Amazon Machine Images (AMI) use Linux as the value.
+os: linux
+
+# A list of files to copy on each deployment.
+files:
+  # A directory to copy in each application revision, if only a "/" is used for the source, all files in that directory are copied.
+  - source: /
+    destination: /app
+
+# The "hooks" section defines the scripts to be run on each Lifecycle event.
+# The hook events are run in the following order: "BeforeInstall", "ApplicationStop", "ApplicationStart", "ValidateService"
+hooks:
+  # Prior to installation steps, run the following actions.
+  BeforeInstall:
+    # The location for the "install_docker.sh" script to install Docker and docker-compose.
+    - location: install_docker.sh
+      # Run the CodeDploy agent with root permissions.
+      runas: root
+
+  # Run the lifecycle event to stop the application via the defined script.
+  ApplicationStop:
+    - location: stop.sh
+      timeout: 2000
+      runas: root
+
+  # Run the lifecycle event to start the application via the defined script.
+  ApplicationStart:
+    - location: start.sh
+      timeout: 3600
+      runas: root
